@@ -63,7 +63,7 @@
         "level": "INFO",
         "propagate": false
       },
-      "pronun_model": {
+      "server": {
         "handlers": ["console", "file", "error_file"],
         "level": "INFO",
         "propagate": false
@@ -80,4 +80,3 @@
       "level": "INFO"
     }
   }
-  

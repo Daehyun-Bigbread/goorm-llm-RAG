@@ -1,13 +1,12 @@
+# main.py
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
 
-from pronun_model.routers.ask_question import router as ask_question_router
-from pronun_model.routers.delete_files import router as delete_files_router
-from pronun_model.config import CONVERT_TTS_DIR
+from server.routers.questions import router as questions_router
+from server.routers.answers import router as answers_router
+import config
 
-from openai import OpenAI
 from pathlib import Path
 from dotenv import load_dotenv
 import json
@@ -21,13 +20,11 @@ import os
 load_dotenv()
 
 # Configure logging from JSON file
-logging_config_path = Path(__file__).resolve().parent / "logging_config.json"
-with open(logging_config_path, "r") as f:
+with open(config.LOG_CONFIG_PATH, "r") as f:
     logging_config = json.load(f)
 
-
 logging.config.dictConfig(logging_config)
-logger = logging.getLogger("pronun_model")
+logger = logging.getLogger("server")
 
 # Initialize FastAPI app
 app = FastAPI(title="LLM & RAG Service with wikipedia data")
@@ -44,10 +41,6 @@ app.add_middleware(
 # Include routers
 app.include_router(questions_router, prefix="/api/llmserver", tags=["Question"])
 app.include_router(answers_router, prefix="/api/llmserver", tags=["Answer"])
-
-app.mount("/tts", StaticFiles(directory=str(CONVERT_TTS_DIR)), name="tts")
-
-logging.getLogger("watchfiles.main").setLevel(logging.WARNING)
 
 # Root endpoint
 @app.get("/")
@@ -118,7 +111,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=int(os.getenv("PORT", 8000)),
+        port=8000,
         reload=True,
         log_config="logging_config.json"
     )
