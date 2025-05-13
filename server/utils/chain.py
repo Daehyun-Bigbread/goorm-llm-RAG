@@ -8,12 +8,12 @@ import config
 
 from .embedding import SimpleLocalEmbeddings
 from .llm import HuggingFaceInferenceAPI
-from .document import load_documents_and_index, check_faiss_index_exists
+from .document import check_faiss_index_exists
 
 logger = logging.getLogger(__name__)
 
+# RAG 파이프라인을 초기화
 def initialize_rag_pipeline() -> RetrievalQA:
-    """RAG 파이프라인을 초기화합니다."""
     try:
         # 로컬 임베딩 모델 초기화 (문서 임베딩은 이미 생성된 index 사용)
         embeddings = SimpleLocalEmbeddings()
@@ -29,16 +29,20 @@ def initialize_rag_pipeline() -> RetrievalQA:
                 allow_dangerous_deserialization=True
             )
         else:
-            # 이미 존재해야 하는 인덱스가 없으면 오류 발생
             logger.error(f"FAISS 인덱스를 찾을 수 없습니다: {config.FAISS_INDEX_PATH}")
             raise FileNotFoundError(f"FAISS 인덱스 파일이 존재하지 않습니다: {config.FAISS_INDEX_PATH}")
         
-        # 검색기 생성
+        # retriever 생성
         retriever = vectorstore.as_retriever(
-            search_kwargs={"k": 20}  # 더 많은 문서 검색
+            search_type="mmr",  # Maximum Marginal Relevance - 다양성과 관련성 균형
+            search_kwargs={
+                "k": 15,  # 최종 반환 문서 수
+                "fetch_k": 40,  # 초기 검색 문서 수
+                "lambda_mult": 0.9,  # 관련성 가중치 (0~1)
+            }
         )
         
-        # LLM 초기화 - 새로운 API 클라이언트 사용
+        # LLM 초기화 
         llm = HuggingFaceInferenceAPI(
             temperature=float(os.getenv("TEMPERATURE", 0.2)),
             max_tokens=int(os.getenv("MAX_NEW_TOKENS", 512)),
@@ -46,7 +50,6 @@ def initialize_rag_pipeline() -> RetrievalQA:
             model_name=os.getenv("LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
         )
         
-        # 맵리듀스 체인 대신 스터프 체인 (직접 생성)
         prompt_template = """다음 여러 문서의 내용을 바탕으로 질문에 답변하세요.
         
 문서 내용:
@@ -54,17 +57,17 @@ def initialize_rag_pipeline() -> RetrievalQA:
 
 질문: {question}
 
-최종 답변 (모든 정보를 종합하여 간결하게 답변하세요. 문서에 관련 정보가 없으면 "주어진 문맥에서 답을 찾을 수 없습니다."라고 응답):"""
+최종 답변 (모든 정보를 종합하여 간결하게 한 문단으로 작성하세요. 문장 사이에는 공백만 사용하고, 절대 줄바꿈 문자(\\n)를 포함하지 마세요. 문서에 관련 정보가 없으면 "주어진 문맥에서 답를 찾을 수 없습니다."라고만 응답):"""
         
         PROMPT = PromptTemplate(
             template=prompt_template,
             input_variables=["context", "question"]
         )
         
-        # QA 체인 생성 (stuff 방식)
+        # QA 체인 생성 
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
-            chain_type="stuff",  # map_reduce 대신 stuff 사용
+            chain_type="stuff",
             retriever=retriever,
             return_source_documents=True,
             chain_type_kwargs={"prompt": PROMPT}

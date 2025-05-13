@@ -8,13 +8,10 @@ from huggingface_hub import InferenceClient
 
 logger = logging.getLogger(__name__)
 
+# Hugging Face Inference API
 class HuggingFaceInferenceAPI(LLM):
-    """Hugging Face Inference API를 사용한 LLM"""
     
-    # 민감한 정보 - 환경 변수에서 로드되어야 함
     api_key: str = None
-    
-    # 비민감 구성 파라미터 - 코드에 포함되어도 안전함
     model_name: str = "meta-llama/Llama-3.1-8B-Instruct"
     temperature: float = 0.2
     max_tokens: int = 512
@@ -25,8 +22,8 @@ class HuggingFaceInferenceAPI(LLM):
     def _llm_type(self) -> str:
         return "huggingface_inference_api"
     
+    # LLM API 호출
     def _call(self, prompt: str, stop: Optional[List[str]] = None, run_manager: Optional[CallbackManagerForLLMRun] = None, **kwargs) -> str:
-        """LLM API 호출"""
         api_key = self.api_key or os.getenv("HUGGINGFACE_API_KEY")
         
         try:
@@ -60,9 +57,9 @@ class HuggingFaceInferenceAPI(LLM):
             logger.error(f"LLM API 호출 오류: {str(e)}")
             raise ValueError(f"LLM API 호출 오류: {str(e)}")
     
+    # 모델 식별 파라미터
     @property
     def _identifying_params(self) -> Mapping[str, Any]:
-        """모델 식별 파라미터"""
         return {
             "model_name": self.model_name,
             "temperature": self.temperature,

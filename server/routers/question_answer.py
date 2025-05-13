@@ -23,14 +23,9 @@ def get_rag_pipeline():
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+# 질문에 대한 답변 생성
 @router.post("/query", response_model=AnswerResponse)
-async def answer_question(
-    request: Question, 
-    rag_pipeline=Depends(get_rag_pipeline)
-):
-    """
-    질문에 대한 답변을 생성합니다.
-    """
+async def answer_question(request: Question, rag_pipeline=Depends(get_rag_pipeline)):
     try:
         start_time = time.time()
         query = request.question
