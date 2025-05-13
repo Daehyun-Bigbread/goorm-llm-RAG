@@ -1,7 +1,7 @@
 # server/utils/chain.py
 import os
 import logging
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 import config
@@ -27,7 +27,8 @@ def initialize_rag_pipeline() -> RetrievalQA:
             vectorstore = FAISS.load_local(
                 folder_path=str(config.DATA_DIR),
                 embeddings=embeddings,
-                index_name="document_index"
+                index_name="document_index",
+                allow_dangerous_deserialization=True
             )
         else:
             # 이미 존재해야 하는 인덱스가 없으면 오류 발생
