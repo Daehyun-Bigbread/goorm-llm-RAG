@@ -36,9 +36,9 @@ def initialize_rag_pipeline() -> RetrievalQA:
         retriever = vectorstore.as_retriever(
             search_type="mmr",  # Maximum Marginal Relevance - 다양성과 관련성 균형
             search_kwargs={
-                "k": 15,  # 최종 반환 문서 수
-                "fetch_k": 40,  # 초기 검색 문서 수
-                "lambda_mult": 0.9,  # 관련성 가중치 (0~1)
+                "k": 5,  # 최종 반환 문서 수
+                "fetch_k": 60,  # 초기 검색 문서 수
+                "lambda_mult": 0.8,  # 관련성 가중치 (0~1)
             }
         )
         
