@@ -5,3 +5,7 @@ python-dotenv
 langchain
 langchain-community
 langchain_huggingface
+langchain-openai
+huggingface-hub
+colorlog
+faiss-cpu
