@@ -35,35 +35,26 @@ def initialize_rag_pipeline() -> RetrievalQA:
         
         # 검색기 생성
         retriever = vectorstore.as_retriever(
-            search_type="mmr",  # Maximum Marginal Relevance - 다양성과 관련성 균형
-            search_kwargs={
-                "k": 5,  # 최종 반환 문서 수
-                "fetch_k": 20,  # 초기 검색 문서 수
-                "lambda_mult": 0.8,  # 관련성 가중치 (0~1)
-            }
+            search_kwargs={"k": 20}  # 더 많은 문서 검색
         )
         
         # LLM 초기화 - 새로운 API 클라이언트 사용
         llm = HuggingFaceInferenceAPI(
-            temperature=float(os.getenv("TEMPERATURE", 0.0)),
+            temperature=float(os.getenv("TEMPERATURE", 0.2)),
             max_tokens=int(os.getenv("MAX_NEW_TOKENS", 512)),
-            top_p=float(os.getenv("TOP_P", 1.0)),
+            top_p=float(os.getenv("TOP_P", 0.95)),
             model_name=os.getenv("LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
         )
         
-        # server/utils/chain.py의 프롬프트 템플릿 부분 수정
-        prompt_template = """다음 문서만 보고 질문에 답하세요:
-
-문서:
+        # 맵리듀스 체인 대신 스터프 체인 (직접 생성)
+        prompt_template = """다음 여러 문서의 내용을 바탕으로 질문에 답변하세요.
+        
+문서 내용:
 {context}
 
 질문: {question}
 
-규칙:
-- 문서에 없는 정보는 절대 사용하지 마세요.
-- 문서에서 답을 찾을 수 없으면 "문서에서 답을 찾을 수 없습니다."라고만 답하세요.
-
-답변:"""
+최종 답변 (모든 정보를 종합하여 간결하게 답변하세요. 문서에 관련 정보가 없으면 "주어진 문맥에서 답을 찾을 수 없습니다."라고 응답):"""
         
         PROMPT = PromptTemplate(
             template=prompt_template,

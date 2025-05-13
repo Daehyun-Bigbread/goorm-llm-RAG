@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class SimpleLocalEmbeddings(Embeddings):
     """OpenAI 임베딩 API를 사용한 쿼리 임베딩 클래스"""
     
-    def __init__(self, model_name="text-embedding-3-small"):
+    def __init__(self, model_name="text-embedding-ada-002"):
         """초기화"""
         self.model_name = model_name
         
