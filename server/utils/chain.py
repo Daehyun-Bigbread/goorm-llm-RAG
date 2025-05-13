@@ -44,10 +44,10 @@ def initialize_rag_pipeline() -> RetrievalQA:
         
         # LLM 초기화 
         llm = HuggingFaceInferenceAPI(
-            temperature=float(os.getenv("TEMPERATURE", 0.2)),
-            max_tokens=int(os.getenv("MAX_NEW_TOKENS", 512)),
-            top_p=float(os.getenv("TOP_P", 0.95)),
-            model_name=os.getenv("LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
+            temperature=0.2,
+            max_tokens=512,
+            top_p=0.95,
+            model_name="meta-llama/Llama-3.1-8B-Instruct"
         )
         
         prompt_template = """다음 여러 문서의 내용을 바탕으로 질문에 답변하세요.
