@@ -1,4 +1,4 @@
-# server/routers/rag_router.py
+# server/routers/question_answer.py
 import logging
 from fastapi import APIRouter, HTTPException, Depends
 import time
@@ -37,7 +37,7 @@ async def answer_question(
         logger.info(f"답변 생성 요청: '{query}'")
         
         # RAG 파이프라인 실행
-        result = rag_pipeline({"query": query})
+        result = rag_pipeline.invoke({"query": query})
         
         # 결과 추출
         answer = result["result"]
@@ -73,10 +73,15 @@ async def answer_question(
         return response
     
     except Exception as e:
-        logger.error(f"답변 생성 오류: {str(e)}", extra={
-            "errorType": "RAGPipelineError",
-            "error_message": str(e)
-        })
+        import traceback
+        error_traceback = traceback.format_exc()
+        
+        # 오류 정보 자세히 로깅
+        logger.error(f"답변 생성 오류: {str(e) if str(e) else '(빈 오류 메시지)'}")
+        logger.error(f"오류 타입: {type(e).__name__}")
+        logger.error(f"스택 트레이스: {error_traceback}")
+        
+        # HTTP 예외 발생
         if isinstance(e, HTTPException):
             raise e
-        raise HTTPException(status_code=500, detail=f"답변 생성 중 오류가 발생했습니다: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"답변 생성 중 오류가 발생했습니다: {str(e) if str(e) else '알 수 없는 오류'}")

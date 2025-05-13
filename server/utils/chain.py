@@ -6,7 +6,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 import config
 
-from .embedding import HuggingFaceInferenceAPIEmbeddings
+from .embedding import SimpleLocalEmbeddings
 from .llm import HuggingFaceInferenceAPI
 from .document import load_documents_and_index, check_faiss_index_exists
 
@@ -15,11 +15,9 @@ logger = logging.getLogger(__name__)
 def initialize_rag_pipeline() -> RetrievalQA:
     """RAG 파이프라인을 초기화합니다."""
     try:
-        # 임베딩 모델 초기화 (쿼리 임베딩에만 사용)
-        embeddings = HuggingFaceInferenceAPIEmbeddings(
-            model_name=os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
-        )
-        
+        # 로컬 임베딩 모델 초기화 (문서 임베딩은 이미 생성된 index 사용)
+        embeddings = SimpleLocalEmbeddings()
+
         # FAISS 인덱스 확인
         if check_faiss_index_exists():
             # 기존 FAISS 인덱스 로드
@@ -37,7 +35,7 @@ def initialize_rag_pipeline() -> RetrievalQA:
         
         # 검색기 생성
         retriever = vectorstore.as_retriever(
-            search_kwargs={"k": int(os.getenv("RETRIEVER_TOP_K", 3))}
+            search_kwargs={"k": 10}  # 더 많은 문서 검색
         )
         
         # LLM 초기화 - 새로운 API 클라이언트 사용
@@ -48,24 +46,25 @@ def initialize_rag_pipeline() -> RetrievalQA:
             model_name=os.getenv("LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
         )
         
-        # 프롬프트 템플릿 생성
-        prompt_template = """다음 문맥을 바탕으로 질문에 답하세요. 문맥에 관련 정보가 없으면 "주어진 문맥에서 답을 찾을 수 없습니다."라고 응답하세요.
-
-문맥: {context}
+        # 맵리듀스 체인 대신 스터프 체인 (직접 생성)
+        prompt_template = """다음 여러 문서의 내용을 바탕으로 질문에 답변하세요.
+        
+문서 내용:
+{context}
 
 질문: {question}
 
-답변:"""
+최종 답변 (모든 정보를 종합하여 간결하게 답변하세요. 문서에 관련 정보가 없으면 "주어진 문맥에서 답을 찾을 수 없습니다."라고 응답):"""
         
         PROMPT = PromptTemplate(
             template=prompt_template,
             input_variables=["context", "question"]
         )
         
-        # QA 체인 생성
+        # QA 체인 생성 (stuff 방식)
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
-            chain_type="stuff",
+            chain_type="stuff",  # map_reduce 대신 stuff 사용
             retriever=retriever,
             return_source_documents=True,
             chain_type_kwargs={"prompt": PROMPT}

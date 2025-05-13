@@ -4,3 +4,4 @@ uvicorn
 python-dotenv
 langchain
 langchain-community
+langchain_huggingface
