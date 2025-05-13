@@ -16,7 +16,7 @@ class HuggingFaceInferenceAPI(LLM):
     
     # 비민감 구성 파라미터 - 코드에 포함되어도 안전함
     model_name: str = "meta-llama/Llama-3.1-8B-Instruct"
-    temperature: float = 0.2
+    temperature: float = 0.0
     max_tokens: int = 512
     top_p: float = 0.95
     provider: str = "novita"

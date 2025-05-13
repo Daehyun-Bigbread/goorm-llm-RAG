@@ -35,26 +35,32 @@ def initialize_rag_pipeline() -> RetrievalQA:
         
         # 검색기 생성
         retriever = vectorstore.as_retriever(
-            search_kwargs={"k": 10}  # 더 많은 문서 검색
+            search_kwargs={"k": 3}  # 더 많은 문서 검색
         )
         
         # LLM 초기화 - 새로운 API 클라이언트 사용
         llm = HuggingFaceInferenceAPI(
-            temperature=float(os.getenv("TEMPERATURE", 0.2)),
+            temperature=float(os.getenv("TEMPERATURE", 0.0)),
             max_tokens=int(os.getenv("MAX_NEW_TOKENS", 512)),
-            top_p=float(os.getenv("TOP_P", 0.95)),
+            top_p=float(os.getenv("TOP_P", 1.0)),
             model_name=os.getenv("LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
         )
         
-        # 맵리듀스 체인 대신 스터프 체인 (직접 생성)
-        prompt_template = """다음 여러 문서의 내용을 바탕으로 질문에 답변하세요.
-        
-문서 내용:
+        prompt_template = """당신은 제공된 문맥에만 기반하여 정확하게 답변하는 시스템입니다.
+
+엄격한 규칙:
+1. 오직 제공된 문맥에 명시적으로 포함된 정보만 사용하세요.
+2. 문맥에 명확하게 답이 없는 경우 반드시 "주어진 문맥에서 답을 찾을 수 없습니다."라고만 응답하세요.
+3. 절대로 스스로 정보를 생성하거나 추측하지 마세요.
+4. 짧고 직접적으로 답변하세요.
+5. 문맥에 없는 연도, 날짜, 이름 또는 수치를 절대 포함하지 마세요.
+
+문맥:
 {context}
 
 질문: {question}
 
-최종 답변 (모든 정보를 종합하여 간결하게 답변하세요. 문서에 관련 정보가 없으면 "주어진 문맥에서 답을 찾을 수 없습니다."라고 응답):"""
+답변 (반드시 위 규칙을 따르고, 문맥에 없는 정보는 절대 포함하지 마세요):"""
         
         PROMPT = PromptTemplate(
             template=prompt_template,
