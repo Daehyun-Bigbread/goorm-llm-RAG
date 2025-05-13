@@ -35,7 +35,12 @@ def initialize_rag_pipeline() -> RetrievalQA:
         
         # 검색기 생성
         retriever = vectorstore.as_retriever(
-            search_kwargs={"k": 3}  # 더 많은 문서 검색
+            search_type="mmr",  # Maximum Marginal Relevance - 다양성과 관련성 균형
+            search_kwargs={
+                "k": 5,  # 최종 반환 문서 수
+                "fetch_k": 20,  # 초기 검색 문서 수
+                "lambda_mult": 0.8,  # 관련성 가중치 (0~1)
+            }
         )
         
         # LLM 초기화 - 새로운 API 클라이언트 사용
@@ -46,21 +51,19 @@ def initialize_rag_pipeline() -> RetrievalQA:
             model_name=os.getenv("LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
         )
         
-        prompt_template = """당신은 제공된 문맥에만 기반하여 정확하게 답변하는 시스템입니다.
+        # server/utils/chain.py의 프롬프트 템플릿 부분 수정
+        prompt_template = """다음 문서만 보고 질문에 답하세요:
 
-엄격한 규칙:
-1. 오직 제공된 문맥에 명시적으로 포함된 정보만 사용하세요.
-2. 문맥에 명확하게 답이 없는 경우 반드시 "주어진 문맥에서 답을 찾을 수 없습니다."라고만 응답하세요.
-3. 절대로 스스로 정보를 생성하거나 추측하지 마세요.
-4. 짧고 직접적으로 답변하세요.
-5. 문맥에 없는 연도, 날짜, 이름 또는 수치를 절대 포함하지 마세요.
-
-문맥:
+문서:
 {context}
 
 질문: {question}
 
-답변 (반드시 위 규칙을 따르고, 문맥에 없는 정보는 절대 포함하지 마세요):"""
+규칙:
+- 문서에 없는 정보는 절대 사용하지 마세요.
+- 문서에서 답을 찾을 수 없으면 "문서에서 답을 찾을 수 없습니다."라고만 답하세요.
+
+답변:"""
         
         PROMPT = PromptTemplate(
             template=prompt_template,

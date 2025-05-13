@@ -18,7 +18,7 @@ class HuggingFaceInferenceAPI(LLM):
     model_name: str = "meta-llama/Llama-3.1-8B-Instruct"
     temperature: float = 0.0
     max_tokens: int = 512
-    top_p: float = 0.95
+    top_p: float = 1.00
     provider: str = "novita"
     
     @property
