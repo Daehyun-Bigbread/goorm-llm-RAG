@@ -6,9 +6,8 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 import config
 
-# 수정된 임포트 경로
 from .embedding import HuggingFaceInferenceAPIEmbeddings
-from .llm import HuggingFaceInferenceAPILLM
+from .llm import HuggingFaceInferenceAPI
 from .document import load_documents_and_index, check_faiss_index_exists
 
 logger = logging.getLogger(__name__)
@@ -17,7 +16,9 @@ def initialize_rag_pipeline() -> RetrievalQA:
     """RAG 파이프라인을 초기화합니다."""
     try:
         # 임베딩 모델 초기화 (쿼리 임베딩에만 사용)
-        embeddings = HuggingFaceInferenceAPIEmbeddings()
+        embeddings = HuggingFaceInferenceAPIEmbeddings(
+            model_name=os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+        )
         
         # FAISS 인덱스 확인
         if check_faiss_index_exists():
@@ -38,11 +39,12 @@ def initialize_rag_pipeline() -> RetrievalQA:
             search_kwargs={"k": int(os.getenv("RETRIEVER_TOP_K", 3))}
         )
         
-        # LLM 초기화
-        llm = HuggingFaceInferenceAPILLM(
+        # LLM 초기화 - 새로운 API 클라이언트 사용
+        llm = HuggingFaceInferenceAPI(
             temperature=float(os.getenv("TEMPERATURE", 0.2)),
-            max_new_tokens=int(os.getenv("MAX_NEW_TOKENS", 512)),
-            top_p=float(os.getenv("TOP_P", 0.95))
+            max_tokens=int(os.getenv("MAX_NEW_TOKENS", 512)),
+            top_p=float(os.getenv("TOP_P", 0.95)),
+            model_name=os.getenv("LLM_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
         )
         
         # 프롬프트 템플릿 생성
