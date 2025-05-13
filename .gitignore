@@ -1,0 +1,12 @@
+# 민감한 정보가 포함된 파일
+.env
+
+# 로그 파일
+logs/
+*.log
+
+# 캐시 및 임시 파일
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
