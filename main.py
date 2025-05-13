@@ -3,8 +3,7 @@ from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from server.routers.questions import router as questions_router
-from server.routers.answers import router as answers_router
+from server.routers.question_answer import router as question_answer_router
 import config
 
 from pathlib import Path
@@ -39,8 +38,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(questions_router, prefix="/api/llmserver", tags=["Question"])
-app.include_router(answers_router, prefix="/api/llmserver", tags=["Answer"])
+app.include_router(question_answer_router, prefix="/api/llmserver", tags=["Q&A"])
 
 # Root endpoint
 @app.get("/")
