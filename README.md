@@ -55,9 +55,9 @@ pip install -r requirements.txt
 
 ### 환경 변수 설정
 ```bash
-# .env 파일 생성
-echo "OPENAI_API_KEY=your_openai_api_key" > .env
-echo "HUGGINGFACE_API_KEY=your_huggingface_api_key" >> .env
+# .env 파일을 최상단 디릭토리에 생성
+"OPENAI_API_KEY=your_openai_api_key"
+"HUGGINGFACE_API_KEY=your_huggingface_api_key"
 ```
 
 ### 실행 방법
@@ -132,6 +132,19 @@ fetch('http://localhost:8000/api/llmserver/query', {
 })
   .then(response => response.json())
   .then(data => console.log(data));
+```
+
+### Docker를 이용한 설치 및 실행
+
+```bash
+# Docker 이미지 빌드
+docker build -t llm-rag-wiki-service .
+
+# Docker 컨테이너 실행 (환경 변수 전달)
+docker run -p 8000:8000 \
+  -e OPENAI_API_KEY=your_openai_api_key \
+  -e HUGGINGFACE_API_KEY=your_huggingface_api_key \
+  llm-rag-wiki-service
 ```
 
 ### 응답 예시
