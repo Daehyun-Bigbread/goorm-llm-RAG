@@ -1,11 +1,11 @@
 # 워키피디아 데이터 기반 LLM 서비스
 
-위키피디아 데이터(KorQuAD)를 활용하여 사용자의 질문에 대한 답변을 생성하는 LLM 서버입니다. RAG(Retrieval-Augmented Generation) 아키텍처를 기반으로 구현되어, 질문에 관련되어 임베딩된 위키피디아 문서를 검색하고 이를 바탕으로 정확한 응답을 생성합니다.
+위키피디아 데이터(KorQuAD)를 활용하여 사용자의 질문에 대한 답변을 생성하는 LLM 서버입니다. RAG(Retrieval-Augmented Generation) 아키텍처를 기반으로 구현되어, 질문에 관련되어 임베딩된 KorQuAD 1.0 Dataset(위키피디아 데이터셋)문서를 검색하고 이를 바탕으로 정확한 응답을 생성합니다.
 
 ### 주요 기능
-- 사용자 질문에 대한 관련 위키피디아 문서 검색
-- 검색된 문서 기반 정확한 응답 생성
-- 응답 생성 시 참조한 위키피디아 문서 출처 제공
+- 사용자 질문에 대한 관련 KorQuAD 1.0 Dataset(위키피디아 데이터셋)에서 검색
+- 검색된 KorQuAD 1.0 Dataset(위키피디아 데이터셋) 기반 정확한 응답 생성
+- 응답 생성 시 참조한 KorQuAD 1.0 Dataset(위키피디아 데이터셋) 문서 출처 제공
 - 질의 범위 제한 메커니즘 (관련 없는 답변 출력 제한)
 
 ## 프로젝트 구조
@@ -178,28 +178,27 @@ docker run -p 8000:8000 \
 ```
 
 ### 주요 컴포넌트
-- **FastAPI 서버**: RESTful API 엔드포인트 제공, 미들웨어로 로깅 및 예외 처리
-- **RAG 파이프라인**: LangChain 기반 질의응답 파이프라인
-- **벡터 데이터베이스**: FAISS 인덱스를 사용한 유사도 검색
-- **LLM 모델**: 오픈소스 LLM 모델 (Llama-3.1-8B-Instruct)을 활용한 텍스트 생성 (from Huggingface)
+- **FastAPI Server**: RESTful API 엔드포인트 제공, 미들웨어로 로깅 및 예외 처리
+- **RAG Pipeline**: LangChain 기반 질의응답 Pipeline
+- **Vector DB**: FAISS 인덱스를 사용한 유사도 검색
+- **LLM Model(Llama-3.1-8B-Instruct)**: 오픈소스 LLM 모델 (Llama-3.1-8B-Instruct)을 활용한 텍스트 생성 (from Huggingface Inference API)
 
 ### 설계 원칙
-- **RAG 아키텍처**: 기존 지식(위키피디아)을 활용하여 LLM의 응답 품질 향상
-- **모듈화 설계**: 검색, 임베딩, LLM 추론 등 각 컴포넌트 독립적 구현으로 유지보수성 확보
-- **효율적인 로깅**: 구조화된 로깅으로 문제 진단 및 모니터링 용이
-- **예외 처리**: 세분화된 예외 처리로 안정적인 서비스 제공
+- **RAG**: KorQuAD 1.0 Dataset(위키피디아 데이터셋)을 활용하여 LLM의 응답에 활용
+- **모듈화**: 검색, Embedding, LLM Inference 등 각 컴포넌트 독립적 구현
+- **로깅**: 구조화된 로깅으로 문제 진단 및 모니터링 용이
 
 ### 기술 스택
 - **언어**: Python 3.8+
-- **웹 프레임워크**: FastAPI
-- **RAG 프레임워크**: LangChain
-- **벡터 데이터베이스**: FAISS
+- **API Framework**: FastAPI
+- **RAG Framework**: LangChain
+- **Vector DB**: FAISS
 - **LLM**: Huggingface 오픈소스 모델 (Llama-3.1-8B-Instruct)
-- ** 사용자 쿼리 임베딩**: OpenAI 임베딩 API (text-embedding-ada-002)
+- ** 사용자 Query Embedding**: OpenAI 임베딩 API (text-embedding-ada-002)
 
 ### 데이터 처리 파이프라인
-1. **전처리**: KorQuAD 데이터셋에서 위키피디아 문서 추출 및 정제
-2. **임베딩**: OpenAI API를 사용해 문서 텍스트 임베딩 생성
-3. **인덱싱**: FAISS를 통한 벡터 인덱스 구축
-4. **검색**: 사용자 질문 임베딩 기반 유사 문서 검색 (MMR 알고리즘 사용)
-5. **생성**: 검색된 문서 컨텍스트를 바탕으로 LLM을 통한 답변 생성
+1. **Preprocess(전처리)**: KorQuAD 1.0 Dataset(위키피디아 데이터셋)에서 문서 추출, 전처리, 임베딩
+2. **Embedding(임베딩)**: OpenAI Embedding API(text-embedding-ada-002)를 사용해 사용자 쿼리 임베딩 생성
+3. **Vector Indexing**: FAISS를 통한 Vector Index 구축
+4. **검색**: 사용자 쿼리(질문) 임베딩 기반 유사 문서 검색 (MMR 알고리즘 사용)
+5. **Question & Answering**: 검색된 문서 컨텍스트를 바탕으로 LLM(Llama-3.1-8B-Instruct)을 통한 답변 생성
