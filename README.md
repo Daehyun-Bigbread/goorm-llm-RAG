@@ -74,6 +74,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## API 사용 예시
+API는 Swagger UI를 통해 문서화되어 있습니다. 서버 실행 후 http://localhost:8000/docs에서 API 문서를 확인할 수 있습니다.
 
 ### API 엔드포인트
 | 엔드포인트 | 메소드 | 설명 |
@@ -81,18 +82,27 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 | `/api/llmserver/query` | POST | 질문에 대한 답변 생성 |
 | `/health` | GET | 서버 상태 확인 |
 
-### API 스키마
-```python
-# 요청 스키마
-class Question(BaseModel):
-    question: str
+### Swagger에서 테스트 방법
+1. 서버를 실행한 후 브라우저에서 `http://localhost:8000/docs` 접속
+2. '/api/llmserver/query' 엔드포인트 펼치기
+3. 'Try it out' 버튼 클릭
+4. 요청 본문에 질문 입력:
+   ```json
+   {
+     "question": "대한민국의 수도는 어디인가요?"
+   }
+   ```
+5. 'Execute' 버튼 클릭하여 결과 확인
 
-# 응답 스키마
-class AnswerResponse(BaseModel):
-    retrieved_document_id: int
-    retrieved_document: str
-    question: str
-    answers: str
+### curl 요청 예시 (Postman)
+```bash
+curl -X 'POST' \
+  'http://localhost:8000/api/llmserver/query' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "question": "대한민국의 수도는 어디인가요?"
+}'
 ```
 
 ### 요청 예시 (Python)
