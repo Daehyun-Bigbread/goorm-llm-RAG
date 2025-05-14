@@ -158,9 +158,15 @@ docker run -p 8000:8000 \
 }
 ```
 
-### 아키텍처 개요
+### 아키텍처
 ![goorm-rag-architecture drawio](https://github.com/user-attachments/assets/54379d30-859e-4e12-be95-285f09afa829)
-
+- 사용자 요청 처리: 클라이언트가 FastAPI 서버로 질문 전송
+- RAG 파이프라인 실행:
+    - OpenAI Embedding API (text-embedding-ada-002)를 통해 query(질문)을 벡터로 변환    
+    - 변환된 Vector로 FAISS(Vector DB)에서 유사 Document 검색 (MMR 알고리즘 적용)
+    - 선택된 문서와 질문을 결합하여 Prompt 생성
+    - LLM 추론: Augmentation된 Prompt를 기반으로 LLM(Llama-3.1-8B-Instruct) 모델이 응답 생성
+    - 응답 반환: 생성된 Answer와 검색된 Document를 Pydantic 모델로 구조화하여 JSON으로 반환
 
 ### 주요 컴포넌트
 - **FastAPI Server**: RESTful API 엔드포인트 제공, 미들웨어로 로깅 및 예외 처리
@@ -179,7 +185,7 @@ docker run -p 8000:8000 \
 - **RAG Framework**: LangChain
 - **Vector DB**: FAISS
 - **LLM**: Huggingface 오픈소스 모델 (Llama-3.1-8B-Instruct)
-- **사용자 Query Embedding**: OpenAI 임베딩 API (text-embedding-ada-002)
+- **사용자 Query Embedding**: OpenAI Embedding API (text-embedding-ada-002)
 
 ### 데이터 처리 파이프라인
 1. **Preprocess(전처리)**: KorQuAD 1.0 Dataset(위키피디아 데이터셋)에서 문서 추출, 전처리, 임베딩
