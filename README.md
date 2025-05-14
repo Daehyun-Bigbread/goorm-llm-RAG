@@ -185,7 +185,7 @@ docker run -p 8000:8000 \
 
 ### 설계 원칙
 - **RAG**: KorQuAD 1.0 Dataset(위키피디아 데이터셋)을 활용하여 LLM의 응답에 활용
-- **모듈화**: Chain, Embedding, LLM Inference 등 각 컴포넌트 독립적 구현
+- **모듈화**: Chain(Retriver), Embedding, LLM Inference 등 각 컴포넌트 독립적 구현
 - **로깅**: 구조화된 로깅으로 문제 진단 및 모니터링 용이
 
 ### 기술 스택
