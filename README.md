@@ -194,11 +194,12 @@ docker run -p 8000:8000 \
 - **RAG Framework**: LangChain
 - **Vector DB**: FAISS
 - **LLM**: Huggingface 오픈소스 모델 (Llama-3.1-8B-Instruct)
-- ** 사용자 Query Embedding**: OpenAI 임베딩 API (text-embedding-ada-002)
+- **사용자 Query Embedding**: OpenAI 임베딩 API (text-embedding-ada-002)
 
 ### 데이터 처리 파이프라인
 1. **Preprocess(전처리)**: KorQuAD 1.0 Dataset(위키피디아 데이터셋)에서 문서 추출, 전처리, 임베딩
 2. **Embedding(임베딩)**: OpenAI Embedding API(text-embedding-ada-002)를 사용해 사용자 쿼리 임베딩 생성
 3. **Vector Indexing**: FAISS를 통한 Vector Index 구축
 4. **검색**: 사용자 쿼리(질문) 임베딩 기반 유사 문서 검색 (MMR 알고리즘 사용)
+   - MMR 알고리즘은 정보 검색 시스템에서 검색 결과의 다양성과 관련성 사이의 균형을 맞추기 위해 사용되는 알고리즘
 5. **Question & Answering**: 검색된 문서 컨텍스트를 바탕으로 LLM(Llama-3.1-8B-Instruct)을 통한 답변 생성
