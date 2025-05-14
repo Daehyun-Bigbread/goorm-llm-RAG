@@ -161,12 +161,12 @@ docker run -p 8000:8000 \
 ### 아키텍처
 ![goorm-rag-architecture drawio](https://github.com/user-attachments/assets/54379d30-859e-4e12-be95-285f09afa829)
 - 사용자 요청 처리: 클라이언트가 FastAPI 서버로 질문 전송
-- RAG 파이프라인 실행:
+- RAG 파이프라인 실행
     - OpenAI Embedding API (text-embedding-ada-002)를 통해 query(질문)을 벡터로 변환    
     - 변환된 Vector로 FAISS(Vector DB)에서 유사 Document 검색 (MMR 알고리즘 적용)
     - 선택된 문서와 질문을 결합하여 Prompt 생성
     - LLM 추론: Augmentation된 Prompt를 기반으로 LLM(Llama-3.1-8B-Instruct) 모델이 응답 생성
-    - 응답 반환: 생성된 Answer와 검색된 Document를 Pydantic 모델로 구조화하여 JSON으로 반환
+- 응답 반환: 생성된 Answer와 검색된 Document를 Pydantic 모델로 구조화하여 JSON으로 반환
 
 ### 주요 컴포넌트
 - **FastAPI Server**: RESTful API 엔드포인트 제공, 미들웨어로 로깅 및 예외 처리
