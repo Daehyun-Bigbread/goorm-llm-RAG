@@ -72,8 +72,9 @@ python main.py
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-## API 사용 예시
-API는 Swagger UI를 통해 문서화되어 있습니다. 서버 실행 후 http://localhost:8000/docs에서 API 문서를 확인할 수 있습니다.
+## API 사용
+API는 Swagger UI를 통해 문서화되어 있습니다.
+- 서버 실행 후 http://localhost:8000/docs에서 API 문서를 확인할 수 있습니다.
 
 ### API 엔드포인트
 | 엔드포인트 | 메소드 | 설명 |
@@ -179,8 +180,8 @@ docker run -p 8000:8000 \
 ### 주요 컴포넌트
 - **FastAPI 서버**: RESTful API 엔드포인트 제공, 미들웨어로 로깅 및 예외 처리
 - **RAG 파이프라인**: LangChain 기반 질의응답 파이프라인
-- **벡터 데이터베이스**: FAISS 인덱스를 사용한 효율적인 유사도 검색
-- **LLM 모델**: Huggingface 모델을 활용한 텍스트 생성
+- **벡터 데이터베이스**: FAISS 인덱스를 사용한 유사도 검색
+- **LLM 모델**: 오픈소스 LLM 모델 (Llama-3.1-8B-Instruct)을 활용한 텍스트 생성 (from Huggingface)
 
 ### 설계 원칙
 - **RAG 아키텍처**: 기존 지식(위키피디아)을 활용하여 LLM의 응답 품질 향상
@@ -194,7 +195,7 @@ docker run -p 8000:8000 \
 - **RAG 프레임워크**: LangChain
 - **벡터 데이터베이스**: FAISS
 - **LLM**: Huggingface 오픈소스 모델 (Llama-3.1-8B-Instruct)
-- **임베딩**: OpenAI 임베딩 API (text-embedding-ada-002)
+- ** 사용자 쿼리 임베딩**: OpenAI 임베딩 API (text-embedding-ada-002)
 
 ### 데이터 처리 파이프라인
 1. **전처리**: KorQuAD 데이터셋에서 위키피디아 문서 추출 및 정제
