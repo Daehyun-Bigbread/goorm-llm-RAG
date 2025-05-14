@@ -1,6 +1,6 @@
 # 워키피디아 데이터 기반 LLM 서비스
 
-위키피디아 데이터(KorQuAD)를 활용하여 사용자의 질문에 대한 답변을 생성하는 LLM 서버입니다. RAG(Retrieval-Augmented Generation) 아키텍처를 기반으로 구현되어, 질문에 관련되어 임베딩된 KorQuAD 1.0 Dataset(위키피디아 데이터셋)문서를 검색하고 이를 바탕으로 정확한 응답을 생성합니다.
+위키피디아 데이터(KorQuAD)를 활용하여 사용자의 질문에 대한 답변을 생성하는 LLM 서버입니다. RAG(Retrieval-Augmented Generation) 아키텍처를 기반으로 구현되어, 질문에 관련되어 임베딩된 KorQuAD 1.0 Dataset(위키피디아 데이터셋)문서를 검색하고 이를 바탕으로 응답을 생성합니다.
 
 ### 주요 기능
 - 사용자 질문에 대한 관련 KorQuAD 1.0 Dataset(위키피디아 데이터셋)에서 검색
