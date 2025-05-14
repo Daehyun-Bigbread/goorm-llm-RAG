@@ -143,8 +143,6 @@ docker build -t llm-rag-wiki-service .
 
 # Docker 컨테이너 실행 (환경 변수 전달)
 docker run -p 8000:8000 \
-  -e OPENAI_API_KEY=your_openai_api_key \
-  -e HUGGINGFACE_API_KEY=your_huggingface_api_key \
   llm-rag-wiki-service
 ```
 
