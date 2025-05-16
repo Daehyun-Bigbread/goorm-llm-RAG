@@ -36,7 +36,6 @@
 ### 요구 사항
 - Python 3.8 이상
 - 충분한 메모리(최소 8GB 권장)
-- GPU 환경 권장(없을 경우 CPU에서도 동작 가능)
 - API 키: OpenAI(임베딩용), Hugging Face(LLM 추론용)
 
 ### 설치 방법
