@@ -138,11 +138,11 @@ fetch('http://localhost:8000/api/llmserver/query', {
 
 ```bash
 # Docker 이미지 빌드
-docker build -t llm-rag-wiki-service .
+docker build -t goorm-llm-RAG .
 
 # Docker 컨테이너 실행 (환경 변수 전달)
 docker run -p 8000:8000 \
-  llm-rag-wiki-service
+  goorm-llm-RAG
 ```
 
 ### 응답 예시
