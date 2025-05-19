@@ -41,8 +41,8 @@
 ### 설치 방법
 ```bash
 # 저장소 클론
-git clone https://github.com/username/wikipedia-llm-service.git
-cd wikipedia-llm-service
+git clone https://github.com/Daehyun-Bigbread/goorm-llm-RAG.git
+cd goorm-llm-RAG
 
 # 가상환경 생성 및 활성화
 python -m venv venv
@@ -61,8 +61,8 @@ pip install -r requirements.txt
 
 ### 실행 방법
 ```bash
-# 데이터 전처리 및 임베딩 생성
 # data_preprocess/data_preprocess_openai.ipynb 노트북 실행
+# 데이터 전처리 및 임베딩 생성 (생성된 faiss, pkl 파일을 data directory에 넣어줘야함)
 
 # API 서버 실행
 python main.py
